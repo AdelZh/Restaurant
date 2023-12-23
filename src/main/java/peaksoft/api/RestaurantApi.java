@@ -27,12 +27,17 @@ public class RestaurantApi {
     }
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<Long> count(@RequestBody RestoRequest request){
         Long count=restaurantService.countCheque(request);
         return ResponseEntity.ok(count);
     }
 
+    @PutMapping
+    public SimpleResponse update(@RequestParam Long id, @RequestBody RestaurantRequest request){
+        return restaurantService.update(id, request);
+    }
 
     @DeleteMapping
     public SimpleResponse delete(@RequestBody RestaurantRequest request){

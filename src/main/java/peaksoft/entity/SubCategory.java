@@ -1,15 +1,12 @@
 package peaksoft.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.awt.*;
 import java.util.List;
 
 @Entity
-@Table(name = "subCategories")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,8 +18,10 @@ public class SubCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private Category category;
+    @OneToMany(mappedBy = "subCategory")
+    private List<MenuItem> menuItems;
 
 
 

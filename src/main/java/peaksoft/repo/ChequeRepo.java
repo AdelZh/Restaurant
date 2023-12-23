@@ -2,13 +2,13 @@ package peaksoft.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import peaksoft.entity.Cheque;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface ChequeRepo extends JpaRepository<Cheque, Long> {
 
+    List<Cheque> getAllById(long id);
 
 
 }

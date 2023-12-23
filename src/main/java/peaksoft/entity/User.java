@@ -9,8 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import peaksoft.enums.Role;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,6 +27,7 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
+    @Column(unique = true)
     private String email;
     private String password;
     private String phoneNumber;
@@ -40,6 +39,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Cheque> cheque;
 
+
+    public User(String firstName) {
+        this.firstName = firstName;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

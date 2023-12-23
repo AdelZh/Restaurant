@@ -1,6 +1,5 @@
 package peaksoft.service.impl;
-import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityExistsException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -8,16 +7,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import peaksoft.config.JwtService;
 import peaksoft.entity.User;
-import peaksoft.enums.Role;
 import peaksoft.exception.NotFoundException;
 import peaksoft.repo.UserRepo;
 import peaksoft.request.SignInRequest;
-import peaksoft.request.SignUpRequest;
 import peaksoft.response.AuthenticationResponse;
 import peaksoft.service.AuthenticationService;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 
 @Service
@@ -30,62 +24,37 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
 
-    /*@PostConstruct
+
+
+   /*@PostConstruct
     public void init(){
         User user = User.builder()
                 .firstName("admin")
-                .lastName("admins lastName")
+                .lastName("diane")
                 .dateOfBirth(LocalDate.now())
                 .email("admin@gmail.com")
-                .password(passwordEncoder.encode("123456"))
-                .phoneNumber("+996558870024")
+                .password(passwordEncoder.encode("diane"))
+                .phoneNumber("+996507658392")
                 .role(Role.ADMIN)
-                .experience(null)
+                .experience(LocalDate.now())
                 .build();
         if(userRepo.existsByEmail(user.getEmail())){
-            log.error("user with email: "+user.getEmail()+" already exist");
-            throw new EntityExistsException("user with email: "+user.getEmail()+" already exist");
+            log.error("user with email: " +user.getEmail()+ " already exist");
+            throw new EntityExistsException("user with email: " +user.getEmail()+ " already exist");
         }else {
             userRepo.save(user);
         }
     }
 
-     */
+    */
+
+
+
 
 
 
         @Override
-        public AuthenticationResponse signUp(SignUpRequest signUpRequest) {
-            if (userRepo.existsByEmail(signUpRequest.email())){
-                log.error("user with email:" + signUpRequest.email() + "already exist");
-                throw new EntityExistsException(
-                        "user with email: " + signUpRequest.email() + "already exist"
-                );
-            }
-            User user=User.builder()
-                    .firstName(signUpRequest.firstName())
-                    .lastName(signUpRequest.lastName())
-                    .email(signUpRequest.email())
-                    .password(passwordEncoder.encode(signUpRequest.password()))
-                    .phoneNumber(signUpRequest.phoneNumber())
-                    .dateOfBirth(signUpRequest.dateOfBirth())
-                    .experience(signUpRequest.experience())
-                    .role(signUpRequest.role())
-                    .build();
-
-            userRepo.save(user);
-            String token = jwtService.generateToken(user);
-            return AuthenticationResponse.builder().
-                    token(token)
-                    .email(user.getEmail())
-                    .role(user.getRole())
-                    .build();
-        }
-
-
-
-    @Override
-    public AuthenticationResponse singIn(SignInRequest request) {
+        public AuthenticationResponse singIn(SignInRequest request) {
         User user = userRepo.getUserByEmail(request.email()).orElseThrow(
                 () -> {
                     log.error( "user with email: " + request.email() + " not found");

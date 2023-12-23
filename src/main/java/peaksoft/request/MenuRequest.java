@@ -5,8 +5,8 @@ package peaksoft.request;
 public record MenuRequest(
 
         String subCategoryName,
-        String restaurantName,
         String name,
+        String menuName,
         String image,
         int price,
         String description,

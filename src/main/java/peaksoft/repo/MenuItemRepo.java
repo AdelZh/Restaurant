@@ -1,11 +1,12 @@
 package peaksoft.repo;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import peaksoft.entity.MenuItem;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,5 +31,11 @@ public interface MenuItemRepo extends JpaRepository<MenuItem, Long> {
 
     @Query("select m from MenuItem m where m.name = :name")
     Optional<MenuItem> getMenuItemsByName(String name);
+
+    Optional<MenuItem> getMenuItemsById(Long id);
+
+
+    @Query("select m from MenuItem m")
+    Page<MenuItem> getMenuItems(Pageable pageable);
 
 }

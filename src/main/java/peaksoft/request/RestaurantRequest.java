@@ -10,7 +10,9 @@ public record RestaurantRequest(
         String name,
         @NotNull
         String location,
-        RestType restType
+        RestType restType,
+
+        Long numberOfEmployees
 
 ) {
 }

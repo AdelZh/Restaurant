@@ -7,7 +7,6 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "menuItems")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,6 +17,7 @@ public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String name;
     private String image;
     private int price;
@@ -26,7 +26,7 @@ public class MenuItem {
     @ManyToMany
     @JsonIgnore
     private List<Cheque> cheque;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JsonIgnore
     private StopList stopList;
     @ManyToOne(cascade = CascadeType.REMOVE)
@@ -34,7 +34,7 @@ public class MenuItem {
     private Restaurant restaurant;
     @ManyToOne
     @JsonIgnore
-    private SubCategory subCategories;
+    private SubCategory subCategory;
 
 
 }
