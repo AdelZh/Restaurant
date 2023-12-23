@@ -3,11 +3,7 @@ package peaksoft.response;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
 import peaksoft.entity.MenuItem;
-import peaksoft.exception.AlreadyExistException;
-import peaksoft.exception.handler.GlobalExceptionHandler;
-
 
 import java.util.List;
 
@@ -31,5 +27,4 @@ public class ChequeResponse  {
                 this.service = service;
                 this.grandTotal = grandTotal;
         }
-
 }

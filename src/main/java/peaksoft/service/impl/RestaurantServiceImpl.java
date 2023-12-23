@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import peaksoft.entity.Cheque;
-import peaksoft.entity.MenuItem;
-import peaksoft.entity.Restaurant;
+import peaksoft.entity.*;
+import peaksoft.exception.BadCredentialsException;
 import peaksoft.exception.NotFoundException;
-import peaksoft.repo.MenuItemRepo;
-import peaksoft.repo.RestaurantRepo;
+import peaksoft.repo.*;
 import peaksoft.request.RestaurantRequest;
 import peaksoft.request.RestoRequest;
 import peaksoft.response.SimpleResponse;
@@ -17,6 +15,8 @@ import peaksoft.service.RestaurantService;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -26,7 +26,9 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     private final RestaurantRepo restaurantRepo;
     private final MenuItemRepo menuItemRepo;
-
+    private final UserRepo userRepo;
+    private final StopListRepo stopListRepo;
+    private final ChequeRepo chequeRepo;
 
     @Override
     public SimpleResponse saveRestaurant(RestaurantRequest request) {
@@ -34,6 +36,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .name(request.name())
                 .location(request.location())
                 .restType(request.restType())
+                .numberOfEmployees(request.numberOfEmployees())
                 .build();
 
         restaurantRepo.save(restaurant);
@@ -44,48 +47,85 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public Long countCheque(RestoRequest request) {
-        LocalDate today=LocalDate.now();
-        List<MenuItem> menuItems=menuItemRepo.getAll3(request.name());
-        long count=0L;
+        LocalDate today = LocalDate.now();
+        List<MenuItem> menuItems = menuItemRepo.getAll3(request.name());
+        long count = 0L;
 
-        for (MenuItem menuItem1:menuItems){
-            List<Cheque> cheques=menuItem1.getCheque();
-            for(Cheque cheque:cheques){
-                ZonedDateTime chequeDate=cheque.getCreateAt();
-                if (chequeDate != null && chequeDate.toLocalDate().isEqual(today)){
+        for (MenuItem menuItem1 : menuItems) {
+            if(menuItem1.getCheque().isEmpty()){
+                throw new BadCredentialsException("this foods was not serve today: "+request.name());
+            }
+            List<Cheque> cheques = menuItem1.getCheque();
+            for (Cheque cheque : cheques) {
+                ZonedDateTime chequeDate = cheque.getCreateAt();
+                if (chequeDate != null && chequeDate.toLocalDate().isEqual(today)) {
                     count++;
                 }
             }
         }
-       return count;
+        return count;
     }
 
 
     @Override
     public SimpleResponse delete(RestaurantRequest request) {
-        Restaurant restaurant=restaurantRepo.getRestaurantByName(request.name()).orElseThrow(
-                () -> {
-                    String message="restaurant with given name: "+request.name()+" not found";
+        Restaurant restaurant = restaurantRepo.getRestaurantByName(request.name())
+                .orElseThrow(() -> {
+                    String message = "restaurant with given name: " + request.name() + " not found";
                     log.error(message);
                     return new NotFoundException(message);
-                }
-        );
+                });
 
-       for (MenuItem menuItem:menuItemRepo.findAll()){
+        List<MenuItem> menuItems = new ArrayList<>(restaurant.getMenuItem());
+        for (MenuItem menuItem : menuItems) {
+            StopList stopList = menuItem.getStopList();
+            if (stopList != null) {
+                menuItem.setStopList(null);
+                stopListRepo.delete(stopList);
+            }
+
             restaurant.getMenuItem().remove(menuItem);
+            menuItem.setRestaurant(null);
             menuItemRepo.delete(menuItem);
         }
 
-
-
-
+        List<User> users = restaurant.getUser();
+        for (User user : users) {
+            Iterator<Cheque> iterator=user.getCheque().iterator();
+            while (iterator.hasNext()){
+                Cheque cheque=iterator.next();
+                cheque.setUser(null);
+                iterator.remove();
+                chequeRepo.delete(cheque);
+            }
+            user.setRestaurant(null);
+            userRepo.delete(user);
+        }
         restaurantRepo.delete(restaurant);
         return new SimpleResponse(HttpStatus.OK, "deleted");
+    }
 
+
+
+
+    @Override
+    public SimpleResponse update(Long id, RestaurantRequest request) {
+        Restaurant restaurant = restaurantRepo.getRestaurantById(id)
+                .orElseThrow(() -> {
+                    String message = "restaurant with given name: " + id + " not found";
+                    log.error(message);
+                    return new NotFoundException(message);
+                });
+        restaurant.setName(request.name());
+        restaurant.setLocation(request.location());
+        restaurant.setNumberOfEmployees(request.numberOfEmployees());
+        restaurant.setRestType(request.restType());
+
+        restaurantRepo.save(restaurant);
+
+        return new SimpleResponse(HttpStatus.OK, "updated");
     }
 }
-
-
 
 
 

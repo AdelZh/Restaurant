@@ -28,23 +28,33 @@ public class SubCategoryApi {
 
 
     @GetMapping
-    public ResponseEntity<List<SubCategory>> getAll(@RequestBody CategoryRequest categoryRequest) {
+    public ResponseEntity<List<SubCategory>> getAllByCategoryName(@RequestBody CategoryRequest categoryRequest) {
         List<SubCategory> subCategories = service.getAllByCategoryName(categoryRequest);
         return ResponseEntity.ok(subCategories);
     }
 
 
-    @GetMapping("getAll")
-    public ResponseEntity<List<SubCategory>> getAllByGrouping() {
-        List<SubCategory> subCategories = service.getAll();
+    @GetMapping("/getAll")
+    public ResponseEntity<List<SubCategory>> getAllByGrouping(@RequestParam String categoryName) {
+        List<SubCategory> subCategories = service.getAll(categoryName);
         return ResponseEntity.ok(subCategories);
     }
 
-    @GetMapping("search")
+
+    @GetMapping("/search")
     public ResponseEntity<List<SubCategory>> getAllBySearch(@RequestParam String search){
         List<SubCategory> subCategories = service.getBySearch(search);
         return ResponseEntity.ok(subCategories);
     }
 
+
+    @PutMapping
+    public SimpleResponse update(@RequestParam Long id,@RequestBody SubCategoryRequest subCategoryRequest){
+        return service.update(id, subCategoryRequest);
+    }
+    @DeleteMapping("/{id}")
+    public SimpleResponse delete(@PathVariable Long id){
+        return service.delete(id);
+    }
 }
 

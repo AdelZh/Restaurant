@@ -1,6 +1,6 @@
 package peaksoft.api;
 
-import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +11,7 @@ import peaksoft.request.SignInRequest;
 import peaksoft.request.SignUpRequest;
 import peaksoft.response.AuthenticationResponse;
 import peaksoft.service.AuthenticationService;
+import peaksoft.service.UserService;
 
 @RestController
 @Controller
@@ -19,15 +20,14 @@ import peaksoft.service.AuthenticationService;
 public class AuthenticationApi {
 
     private final AuthenticationService authenticationService;
+    private final UserService userService;
 
-    @PermitAll
     @PostMapping("/signUp")
-    AuthenticationResponse signUp(@RequestBody SignUpRequest signUpRequest){
-        return authenticationService.signUp(signUpRequest);
+    AuthenticationResponse signUp(@RequestBody @Valid SignUpRequest signUpRequest){
+        return userService.saveUser(signUpRequest);
     }
 
 
-    @PermitAll
     @PostMapping("/signIn")
     AuthenticationResponse sigIn(@RequestBody SignInRequest signInRequest){
         return authenticationService.singIn(signInRequest);

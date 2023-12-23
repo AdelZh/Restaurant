@@ -19,7 +19,4 @@ public class SimpleResponse {
         this.message = message;
     }
 
-    public SimpleResponse() {
-
-    }
 }

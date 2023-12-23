@@ -1,7 +1,6 @@
 package peaksoft.service;
 
 import peaksoft.entity.Category;
-import peaksoft.entity.SubCategory;
 import peaksoft.request.CategoryRequest;
 import peaksoft.response.SimpleResponse;
 
@@ -14,4 +13,6 @@ public interface CategoryService {
     List<Category> getBySearch(String search);
 
     SimpleResponse delete(CategoryRequest categoryRequest);
+
+    SimpleResponse update(Long id,CategoryRequest categoryRequest);
 }

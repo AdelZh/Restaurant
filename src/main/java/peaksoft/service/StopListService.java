@@ -7,4 +7,8 @@ public interface StopListService {
 
 
     SimpleResponse save(StopListRequest stopListRequest);
+
+    SimpleResponse delete(Long id);
+
+    SimpleResponse update(Long id, StopListRequest stopListRequest);
 }
