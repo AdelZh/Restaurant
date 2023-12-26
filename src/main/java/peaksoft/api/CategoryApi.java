@@ -27,6 +27,7 @@ public class CategoryApi {
     }
 
 
+
     @GetMapping
     public ResponseEntity<List<Category>> getAllBySearch(@RequestParam String search){
         List<Category> categories = categoryService.getBySearch(search);

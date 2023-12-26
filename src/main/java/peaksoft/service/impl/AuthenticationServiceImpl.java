@@ -1,5 +1,7 @@
 package peaksoft.service.impl;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -7,11 +9,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import peaksoft.config.JwtService;
 import peaksoft.entity.User;
+import peaksoft.enums.Role;
 import peaksoft.exception.NotFoundException;
 import peaksoft.repo.UserRepo;
 import peaksoft.request.SignInRequest;
 import peaksoft.response.AuthenticationResponse;
 import peaksoft.service.AuthenticationService;
+
+import java.time.LocalDate;
 
 
 @Service
@@ -24,9 +29,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
 
-
-
-   /*@PostConstruct
+    @PostConstruct
     public void init(){
         User user = User.builder()
                 .firstName("admin")
@@ -38,22 +41,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(Role.ADMIN)
                 .experience(LocalDate.now())
                 .build();
-        if(userRepo.existsByEmail(user.getEmail())){
-            log.error("user with email: " +user.getEmail()+ " already exist");
-            throw new EntityExistsException("user with email: " +user.getEmail()+ " already exist");
-        }else {
+
+        if (userRepo.existsByEmail(user.getEmail())) {
+            log.info("User with email: " + user.getEmail() + " already exists.");
+        } else {
             userRepo.save(user);
         }
     }
 
-    */
+
+
+    @PreDestroy
+    public void preDestroy(){
+        System.out.println("destroy");
+    }
 
 
 
 
-
-
-        @Override
+       @Override
         public AuthenticationResponse singIn(SignInRequest request) {
         User user = userRepo.getUserByEmail(request.email()).orElseThrow(
                 () -> {

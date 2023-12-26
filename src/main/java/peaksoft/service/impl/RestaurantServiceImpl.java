@@ -101,6 +101,7 @@ public class RestaurantServiceImpl implements RestaurantService {
             user.setRestaurant(null);
             userRepo.delete(user);
         }
+
         restaurantRepo.delete(restaurant);
         return new SimpleResponse(HttpStatus.OK, "deleted");
     }

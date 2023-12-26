@@ -9,22 +9,15 @@ import peaksoft.exception.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-
-
-
     @ExceptionHandler(AlreadyExistException.class)
     @ResponseStatus(HttpStatus.ALREADY_REPORTED)
-    public ExceptionResponse alreadyExistException(AlreadyExistException e){
+    public ExceptionResponse alreadyExistException(AlreadyExistException e) {
         return ExceptionResponse.builder()
                 .httpStatus(HttpStatus.ALREADY_REPORTED)
                 .exceptionClassName(e.getClass().getSimpleName())
                 .message(e.getMessage())
                 .build();
     }
-
-
-
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -57,4 +50,13 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(NotValidPhoneNumber.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionResponse notValidPhoneNumber(NotValidPhoneNumber e) {
+        return ExceptionResponse.builder()
+                .httpStatus(HttpStatus.FORBIDDEN)
+                .exceptionClassName(e.getClass().getSimpleName())
+                .message(e.getMessage())
+                .build();
+    }
 }
