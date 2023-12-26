@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import peaksoft.request.ChequeRequest;
 import peaksoft.request.UserRequest;
@@ -13,6 +14,7 @@ import peaksoft.response.SimpleResponse;
 import peaksoft.service.ChequeService;
 
 @RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/cheque")
 @EnableMethodSecurity

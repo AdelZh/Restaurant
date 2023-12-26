@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import peaksoft.entity.Cheque;
 import peaksoft.entity.MenuItem;
 import peaksoft.entity.User;
-import peaksoft.exception.AlreadyExistException;
 import peaksoft.exception.BadCredentialsException;
 import peaksoft.exception.NotFoundException;
 import peaksoft.repo.ChequeRepo;
@@ -35,8 +34,6 @@ public class ChequeServiceImpl implements ChequeService {
     private final UserRepo userRepo;
     private final MenuItemRepo menuItemRepo;
 
-
-
     @Override
     public ChequeResponse save(ChequeRequest chequeRequest) {
         User user = userRepo.getUserByEmail(chequeRequest.email()).orElseThrow(
@@ -50,8 +47,6 @@ public class ChequeServiceImpl implements ChequeService {
 
         double price = 0.0;
         double serviceCharge = 0.1;
-        int money = (int) (price * serviceCharge);
-
 
         Cheque cheque = Cheque.builder()
                 .createAt(ZonedDateTime.now())
@@ -61,22 +56,27 @@ public class ChequeServiceImpl implements ChequeService {
 
         for (MenuItem menuItem : menuItems) {
             if (menuItem.getStopList() == null) {
+
                 price += menuItem.getPrice();
                 menuItem.setCheque(Collections.singletonList(cheque));
                 cheque.setUser(user);
                 chequeRepo.save(cheque);
-            } else {
-                throw new AlreadyExistException("this menuItem is in stopList!!");
+                int money = (int) (price * serviceCharge);
+                return ChequeResponse.builder()
+                        .firstName(cheque.getUser().getEmail())
+                        .menuName(cheque.getMenuItem())
+                        .averagePrice(cheque.getPriceAverage())
+                        .grandTotal((int) price)
+                        .service(money)
+                        .build();
+
             }
         }
-        return ChequeResponse.builder()
-                .firstName(cheque.getUser().getFirstName())
-                .menuName(cheque.getMenuItem())
-                .averagePrice(cheque.getPriceAverage())
-                .grandTotal((int) price)
-                .service(money)
-                .build();
+        throw new NotFoundException("already is in stopList!!");
     }
+
+
+
 
 
     @Override
@@ -97,6 +97,8 @@ public class ChequeServiceImpl implements ChequeService {
         }
         return new SimpleResponse(HttpStatus.BAD_REQUEST, "cheque not found");
     }
+
+
 
 
     @Override
@@ -120,5 +122,4 @@ public class ChequeServiceImpl implements ChequeService {
         }
         return count;
     }
-
 }

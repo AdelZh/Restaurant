@@ -20,9 +20,8 @@ import java.util.List;
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
 
+
     private final CategoryRepo categoryRepo;
-
-
 
     @Override
     public SimpleResponse saveCategory(CategoryRequest categoryRequest) {
@@ -54,7 +53,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         }
         return new SimpleResponse(HttpStatus.OK, "deleted");
-
     }
 
 
@@ -71,6 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepo.save(category);
         return new SimpleResponse(HttpStatus.OK, "updated");
     }
+
 
 
 

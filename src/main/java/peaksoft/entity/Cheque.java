@@ -4,7 +4,6 @@ package peaksoft.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -26,6 +25,8 @@ public class Cheque {
     private User user;
     @ManyToMany(mappedBy = "cheque")
     private List<MenuItem> menuItem;
+
+
 
 
 }

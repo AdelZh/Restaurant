@@ -3,6 +3,7 @@ package peaksoft.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import peaksoft.config.JwtService;
 import peaksoft.entity.Cheque;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final RestaurantRepo restaurantRepo;
     private final UserRepo userRepo;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public AuthenticationResponse saveUser(SignUpRequest signUpRequest) {
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
                 .firstName(signUpRequest.firstName())
                 .lastName(signUpRequest.lastName())
                 .email(signUpRequest.email())
-                .password(signUpRequest.password())
+                .password(passwordEncoder.encode(signUpRequest.password()))
                 .phoneNumber(signUpRequest.phoneNumber())
                 .dateOfBirth(signUpRequest.dateOfBirth())
                 .experience(signUpRequest.experience())
@@ -73,6 +75,7 @@ public class UserServiceImpl implements UserService {
             if (experience < 2) {
                 throw new BadCredentialsException("The candidate's work experience is low!");
             }
+
         }
         userRepo.save(user);
         String token = jwtService.generateToken(user);
@@ -82,6 +85,7 @@ public class UserServiceImpl implements UserService {
                 .role(user.getRole())
                 .build();
     }
+
 
 
 
@@ -99,20 +103,26 @@ public class UserServiceImpl implements UserService {
         List<String> users = assignWorkerRequest.email();
         List<User> notAssignedUser = userRepo.findByUsername(users);
 
-        if (userRepo.countUserByRestaurant(assignWorkerRequest.restaurantId()) > 8) {
+
+
+        if (userRepo.countUserByRestaurant(assignWorkerRequest.restaurantId()) >= 5) {
             throw new BadCredentialsException("no vacancy");
         } else {
             if (!notAssignedUser.isEmpty() && acceptOrReject.equalsIgnoreCase("Accept")) {
                 for (User user : notAssignedUser) {
+                    if (user.getRestaurant() != null){
+                        throw new BadCredentialsException("already assigned");
+                    }
                     user.setRestaurant(restaurant);
                     userRepo.save(user);
-                    return new SimpleResponse(HttpStatus.OK, "assigned");
                 }
+                return new SimpleResponse(HttpStatus.OK, "assigned");
             } else if (!notAssignedUser.isEmpty() && acceptOrReject.equalsIgnoreCase("Reject")) {
                 userRepo.deleteAll(notAssignedUser);
                 return new SimpleResponse(HttpStatus.OK, "users deleted");
+            }else {
+                throw new NotFoundException("No users found for the given email addresses");
             }
-            return new SimpleResponse(HttpStatus.OK, "users not found");
         }
     }
 
