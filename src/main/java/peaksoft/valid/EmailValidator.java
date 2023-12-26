@@ -5,9 +5,6 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import peaksoft.valid.validation.EmailValidation;
 
-/**
- * Abdyrazakova Aizada
- */
 public class EmailValidator implements ConstraintValidator<EmailValidation,String > {
 
     @Override
